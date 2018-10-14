@@ -18,3 +18,9 @@ Homestead.json
 
 # Rocketeer PHP task runner and deployment package. https://github.com/rocketeers/rocketeer
 .rocketeer/
+.DS_Store
+.idea/vcs.xml
+.idea/workspace.xml
+public/.DS_Store
+public/images/.DS_Store
+storage/.DS_Store

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App;
+use Session;
 use App\Client;
 use App\Restaurant;
 use Illuminate\Http\Request;
@@ -87,26 +88,50 @@ class ClientController extends Controller
 
     public function getLogin($restaurant, $table)
     {
-        if (Restaurant::where('domain', '=', $restaurant)->count() == 0) {
-            return redirect()->route('restaurants.index')
-                ->with('error_message',
-                    'Error de url');
-        } else {
-
+        if (Session::get('clientId') != null) {
+            $url = 'restaurant/' . $restaurant . '/' . $table . '/client/' . Session::get('clientId');
+            return redirect($url);
         }
 
-        dd($restaurant);
 
-        return view('customers.login');
+        if (Restaurant::where('domain', '=', $restaurant)->count() == 0) {
+            print("El restaurante no esta registrado.");
+            exit();
+        } else {
+            return view('customers.login');
+        }
     }
 
-    public function setLogin(Request $request, $restaurant, $table)
+    public function setLogin(Request $request, $nameRestaurant, $table)
     {
-        $restaurant = Restaurant::where('domain', '=', $restaurant)->get();
-        //$menu = Menu
-        dd($request);
-        dd($table);
+        $this->validaClient($request);
 
+        $restaurants = Restaurant::where('domain', '=', $nameRestaurant)->first();
+
+        if (!is_numeric($table)) {
+            print("La mesa no es la correcta.");
+            exit();
+        }
+
+        if(intval($restaurants->tables) <= intval($table)) {
+            print("El restaurant no tiene la mesa registrada.");
+            exit();
+        }
+
+        $client = Client::create($request->only('name', 'email'));
+        session(['clientId' => $client->id]);
+
+        $url = 'restaurant/' . $nameRestaurant . '/' . $table . '/client/' . $client->id;
+        return redirect($url);
+    }
+
+    public function validaClient($request)
+    {
+        $this->validate($request, [
+                'name'=>'required|string',
+                'email'=>'required|email'
+            ]
+        );
     }
 
 

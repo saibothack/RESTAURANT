@@ -24,6 +24,7 @@ Route::resource('roles', 'RoleController');
 Route::resource('permissions', 'PermissionController');
 Route::resource('restaurants', 'RestaurantController');
 Route::resource('menus', 'MenuController');
+Route::resource('optionals', 'OptionalController');
 
 Route::get('restaurants/QR/{id}', 'RestaurantController@generateToQR');
 Route::post('restaurants/QR/{id}', 'RestaurantController@printToQR');
@@ -33,4 +34,7 @@ Route::post('restaurants/images/{id}', 'RestaurantController@setImages');
 
 Route::get('restaurant/{restaurant}/{table}', 'ClientController@getLogin');
 Route::post('restaurant/{restaurant}/{table}', 'ClientController@setLogin');
+
+Route::get('restaurant/{restaurant}/{table}/client/{id}', 'MenuController@getMenuClient');
+Route::post('restaurant/{restaurant}/{table}/client/{id}', 'MenuController@setMenuClient');
 

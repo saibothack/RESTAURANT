@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use Session;
 use App\Menu;
 use App\Restaurant;
 use Illuminate\Http\Request;
@@ -148,5 +149,30 @@ class MenuController extends Controller
                 'active'=>'required|int'
             ]
         );
+    }
+
+    public function getMenuClient($nameRestaurant, $table, $id) {
+
+        if (Session::get('clientId') == null) {
+            $url = 'restaurant/' . $nameRestaurant . '/' . $table;
+            return redirect($url);
+        }
+
+        $restaurants = Restaurant::where('domain', '=', $nameRestaurant)->first();
+
+        if (!is_numeric($table)) {
+            print("La mesa no es la correcta.");
+            exit();
+        }
+
+        if(intval($restaurants->tables) <= intval($table)) {
+            print("El restaurant no tiene la mesa registrada.");
+            exit();
+        }
+
+        $menus = Menu::where('restaurants_id', '=', $restaurants->id)->get();
+
+        return view('menus.menu', compact('menus'));
+
     }
 }
