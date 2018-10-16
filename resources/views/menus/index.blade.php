@@ -61,10 +61,12 @@
                     <td>{{ $arrayStatus[$menu->active] }}</td>
 
                     <td class="tdOptions">
-                        <div style="display: inline-flex;">
-                            <a href="{{ URL::to('menus/'.$menu->id.'/images') }}" class="btn btn-primary" style="margin: 1px !important">
-                                <i class="fa fa-file-image-o" aria-hidden="true"></i>
-                            </a>
+                        <div class="text-right" style="display: inline-flex;">
+                            @if ($menu->join[0]->images > 0)
+                                <a href="{{ URL::to('menus/'.$menu->id.'/images') }}" class="btn btn-primary" style="margin: 1px !important">
+                                    <i class="fa fa-file-image-o" aria-hidden="true"></i>
+                                </a>
+                            @endif
 
                             <a href="{{ URL::to('menus/'.$menu->id.'/edit') }}" class="btn btn-info" style="margin: 1px !important">
                                 <i class="fa fa-fw fa-edit"></i>

@@ -42,23 +42,21 @@
                     <div class="col-sm-6">
                         <div class="row">
                             <div class="offset-sm-3 col-sm-8 card">
+
+                                @if(count($menu->join) > 0)
                                 <div class="card-img-top">
                                     <div id="carouselExampleIndicators" class="carousel slide" data-ride="carousel">
                                         <ol class="carousel-indicators">
-                                            <li data-target="#carouselExampleIndicators" data-slide-to="0" class="active"></li>
-                                            <li data-target="#carouselExampleIndicators" data-slide-to="1"></li>
-                                            <li data-target="#carouselExampleIndicators" data-slide-to="2"></li>
+                                            @foreach($menu->join as $image)
+                                                <li data-target="#carouselExampleIndicators" data-slide-to="{{$loop->index}}" @if($loop->index==0) class="active" @endif ></li>
+                                            @endforeach
                                         </ol>
                                         <div class="carousel-inner">
-                                            <div class="carousel-item active">
-                                                <img class="d-block w-100" src="{{ asset('images/default/Cards.svg') }}" alt="First slide">
-                                            </div>
-                                            <div class="carousel-item">
-                                                <img class="d-block w-100" src="{{ asset('images/default/Cards.svg') }}" alt="Second slide">
-                                            </div>
-                                            <div class="carousel-item">
-                                                <img class="d-block w-100" src="{{ asset('images/default/Cards.svg') }}" alt="Third slide">
-                                            </div>
+                                            @foreach($menu->join as $image)
+                                                <div class="carousel-item @if($loop->index==0) active @endif">
+                                                    <img class="d-block w-100" src="{{ asset('images/menu/' . $image->path) }}" alt="{{$image->path}}">
+                                                </div>
+                                            @endforeach
                                         </div>
                                         <a class="carousel-control-prev" href="#carouselExampleIndicators" role="button" data-slide="prev">
                                             <span class="carousel-control-prev-icon" aria-hidden="true"></span>
@@ -70,6 +68,7 @@
                                         </a>
                                     </div>
                                 </div>
+                                @endif
 
                                 <div class="card-body">
                                     <h5 class="card-title">{{ $menu->title  }}</h5>

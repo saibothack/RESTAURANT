@@ -12,7 +12,7 @@ class Menu extends Model
      * @var array
      */
     protected $fillable = [ 
-        'title', 'description', 'price', 'active', 'restaurants_id'
+        'title', 'description', 'price', 'active', 'restaurants_id', 'join'
     ];
 
     public function scopeSearch($query, $search)
@@ -38,5 +38,9 @@ class Menu extends Model
                 $query->where('restaurants_id', '=', $search);
             }
         }
+    }
+
+    public function scopeImagesToMenu($id) {
+        return MenuImages::menu($id)->get();
     }
 }

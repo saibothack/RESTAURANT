@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\MenuImages;
 use DB;
 use phpDocumentor\Reflection\Types\Integer;
 use Session;
@@ -25,6 +26,11 @@ class MenuController extends Controller
         }
 
         $menus = Menu::search($request->get('search'))->active($request->get('active'))->restaurant($request->get('restaurants_id'))->paginate($paginate);
+
+        foreach ($menus as $menu)
+        {
+            $menu->join = Restaurant::where('id', '=', $menu->restaurants_id)->get();
+        }
 
         $restaurants = Restaurant::active(1)->pluck('name', 'id');
 
@@ -73,19 +79,20 @@ class MenuController extends Controller
 
         $menu = Menu::create($request->only('restaurants_id', 'title', 'description', 'price', 'active'));
 
-        $optionals = $request['optionals'];
-        $extras = $request['extras'];
-
-        foreach ($optionals as $optional) {
-            DB::table('optionals_has_menu')->insertGetId(
-                ['menus_id' => $menu->id, 'optionals_id' => $optional]
-            );
+        if (isset($request['optionals'])) {
+            foreach ($request['optionals'] as $optional) {
+                DB::table('optionals_has_menu')->insertGetId(
+                    ['menus_id' => $menu->id, 'optionals_id' => $optional]
+                );
+            }
         }
 
-        foreach ($extras as $extra) {
-            DB::table('optionals_has_menu')->insertGetId(
-                ['menus_id' => $menu->id, 'optionals_id' => $extra]
-            );
+        if(isset($request['extras'])) {
+            foreach ($request['extras'] as $extra) {
+                DB::table('optionals_has_menu')->insertGetId(
+                    ['menus_id' => $menu->id, 'optionals_id' => $extra]
+                );
+            }
         }
 
         return redirect()->route('menus.index')
@@ -228,6 +235,11 @@ class MenuController extends Controller
         }
 
         $menus = Menu::where('restaurants_id', '=', $restaurants->id)->get();
+
+        foreach ($menus as $menu) {
+
+            $menu->join = MenuImages::where('menus_id', '=', $menu->id)->get();
+        }
 
         return view('menus.menu', compact('menus'));
 
