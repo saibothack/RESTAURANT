@@ -43,3 +43,9 @@ Route::post('restaurant/{restaurant}/{table}', 'ClientController@setLogin');
 Route::get('restaurant/{restaurant}/{table}/client/{id}', 'MenuController@getMenuClient');
 Route::post('restaurant/{restaurant}/{table}/client/{id}', 'MenuController@setMenuClient');
 
+Route::get('restaurant/{restaurant}/{table}/client/{idClient}/menu/{id}', 'OrderController@index');
+Route::post('restaurant/{restaurant}/{table}/client/{idClient}/menu/{id}', 'OrderController@store');
+
+Route::get('restaurant/{restaurant}/{table}/client/{idClient}/detail', 'OrderController@show');
+Route::post('restaurant/{restaurant}/{table}/client/{idClient}/detail/{id}', 'OrderController@destroy');
+

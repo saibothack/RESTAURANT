@@ -2,13 +2,13 @@
 
 namespace App\Http\Controllers;
 
-use App\MenuImages;
+
 use DB;
-use phpDocumentor\Reflection\Types\Integer;
 use Session;
 use App\Menu;
 use App\Optional;
 use App\Restaurant;
+use App\MenuImages;
 use Illuminate\Http\Request;
 
 class MenuController extends Controller
@@ -215,14 +215,14 @@ class MenuController extends Controller
         );
     }
 
-    public function getMenuClient($nameRestaurant, $table, $id) {
+    public function getMenuClient($restaurant, $table, $idClient) {
 
         if (Session::get('clientId') == null) {
-            $url = 'restaurant/' . $nameRestaurant . '/' . $table;
+            $url = 'restaurant/' . $restaurant . '/' . $table;
             return redirect($url);
         }
 
-        $restaurants = Restaurant::where('domain', '=', $nameRestaurant)->first();
+        $restaurants = Restaurant::where('domain', '=', $restaurant)->first();
 
         if (!is_numeric($table)) {
             print("La mesa no es la correcta.");
@@ -237,11 +237,27 @@ class MenuController extends Controller
         $menus = Menu::where('restaurants_id', '=', $restaurants->id)->get();
 
         foreach ($menus as $menu) {
-
             $menu->join = MenuImages::where('menus_id', '=', $menu->id)->get();
         }
 
-        return view('menus.menu', compact('menus'));
+        $total = 0;
+        $totalCuenta = 0;
+
+        if (Session::get('dataOrder') != null){
+            $totalCuenta = count(Session::get('dataOrder'));
+
+            foreach (Session::get('dataOrder') as $order) {
+                $total += (intval(Menu::where('id', '=', $order['idMenu'])->first()->price) * intval($order['request']['number_dish']));
+
+                if (isset($order['request']['optionals'])) {
+                    foreach ($order['request']['optionals'] as $optional) {
+                        $total += intval(Optional::where('id', '=', $optional)->first()->price);
+                    }
+                }
+            }
+        }
+
+        return view('menus.menu', compact('menus', 'restaurant', 'table', 'idClient', 'total', 'totalCuenta'));
 
     }
 }

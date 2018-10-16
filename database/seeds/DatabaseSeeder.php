@@ -1,8 +1,10 @@
 <?php
 
 use Illuminate\Database\Seeder;
+
 use App\User;
 use App\Menu;
+use App\Optional;
 use App\Permission;
 use App\Restaurant;
 use Spatie\Permission\Models\Role;
@@ -57,6 +59,55 @@ class DatabaseSeeder extends Seeder
         $this->createRestaurant();
 
       	$this->createUser();
+
+      	$dataOptional = array(
+            'name' => 'Prueba1',
+            'price' => '15',
+            'type' => '1'
+        );
+
+        $optional = Optional::create($dataOptional);
+
+        DB::table('optionals_has_menu')->insertGetId(
+            ['menus_id' => 1, 'optionals_id' => $optional->id]
+        );
+
+        $dataOptional = array(
+            'name' => 'Prueba2',
+            'price' => '20',
+            'type' => '1'
+        );
+
+        $optional = Optional::create($dataOptional);
+
+        DB::table('optionals_has_menu')->insertGetId(
+            ['menus_id' => 2, 'optionals_id' => $optional->id]
+        );
+
+        $dataOptional = array(
+            'name' => 'Prueba3',
+            'price' => '20',
+            'type' => '2'
+        );
+
+        $optional = Optional::create($dataOptional);
+
+        DB::table('optionals_has_menu')->insertGetId(
+            ['menus_id' => 1, 'optionals_id' => $optional->id]
+        );
+
+        $dataOptional = array(
+            'name' => 'Prueba4',
+            'price' => '20',
+            'type' => '2'
+        );
+
+        $optional = Optional::create($dataOptional);
+
+        DB::table('optionals_has_menu')->insertGetId(
+            ['menus_id' => 2, 'optionals_id' => $optional->id]
+        );
+
     }
 
     private function createRestaurant() {
@@ -69,7 +120,7 @@ class DatabaseSeeder extends Seeder
             'days_grace' => '5',
             'tables' => '14',
             'price' => '14000',
-            'images' => '0'
+            'images' => '3'
         );
 
         $restaurant = Restaurant::create($dataRestaurant);

@@ -28,11 +28,22 @@
     <div class="container">
         <br>
         <div class="row">
-            <div class="offset-md-6 col-md-1 text-center">
+            <div class="col-12 text-center">
                 <h1>Menú</h1>
             </div>
-            <div class="offset-md-2 col-md-2 text-right">
-                <i class="fa fa-cart-plus fa-3x" aria-hidden="true"></i>
+        </div>
+        <div class="row">
+            <div class="col text-left">
+                @if($totalCuenta > 0)
+                    <a href="{{ URL::to('restaurant/' . $restaurant . '/' . $table . '/client/' . $idClient . '/detail') }}">
+                        <i class="fa fa-cart-plus fa-3x" aria-hidden="true"></i> Platillos {{$totalCuenta}}
+                    </a>
+                @else
+                    <i class="fa fa-cart-plus fa-3x" aria-hidden="true"></i> Platillos {{$totalCuenta}}
+                @endif
+            </div>
+            <div class="col text-right">
+                <label>Total: $ {{$total}}</label>
             </div>
         </div>
         <br>
@@ -74,7 +85,7 @@
                                     <h5 class="card-title">{{ $menu->title  }}</h5>
                                     <p class="card-text">{{ $menu->description  }}</p>
                                     <p>MXN ${{ number_format($menu->price, 2, '.', ',') }}</p>
-                                    <a href="#" class="btn btn-primary">Ordenar</a>
+                                    <a href="{{ URL::to('restaurant/' . $restaurant . '/' . $table . '/client/' . $idClient . '/menu/' . $menu->id) }}" class="btn btn-primary">Ordenar</a>
                                 </div>
                             </div>
                         </div>
