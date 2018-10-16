@@ -44,7 +44,7 @@ class CreateOptionalsTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('optionals');
         Schema::dropIfExists('optionals_has_menu');
+        Schema::dropIfExists('optionals');
     }
 }

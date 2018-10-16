@@ -26,6 +26,11 @@ Route::resource('restaurants', 'RestaurantController');
 Route::resource('menus', 'MenuController');
 Route::resource('optionals', 'OptionalController');
 
+Route::resource('menus/{id}/images', 'MenuImagesController');
+
+Route::get('restaurants/QR/{id}', 'RestaurantController@generateToQR');
+Route::post('restaurants/QR/{id}', 'RestaurantController@printToQR');
+
 Route::get('restaurants/QR/{id}', 'RestaurantController@generateToQR');
 Route::post('restaurants/QR/{id}', 'RestaurantController@printToQR');
 

@@ -15,8 +15,7 @@ class CreateMenuImagesTable extends Migration
     {
         Schema::create('menu_images', function (Blueprint $table) {
             $table->increments('id');
-            $table->string('description');
-            $table->string('url');
+            $table->string('path');
             $table->unsignedInteger('menus_id');
             
             $table->foreign('menus_id')

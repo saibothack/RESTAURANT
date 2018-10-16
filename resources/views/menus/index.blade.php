@@ -62,7 +62,7 @@
 
                     <td class="tdOptions">
                         <div style="display: inline-flex;">
-                            <a href="{{ URL::to('menus/'.$menu->id.'/edit') }}" class="btn btn-primary" style="margin: 1px !important">
+                            <a href="{{ URL::to('menus/'.$menu->id.'/images') }}" class="btn btn-primary" style="margin: 1px !important">
                                 <i class="fa fa-file-image-o" aria-hidden="true"></i>
                             </a>
 
