@@ -46,6 +46,46 @@
             </div>
         </div>
 
+        <fieldset>
+            <legend>Extras</legend>
+            <div class="row">
+                <div class="offset-md-1 col-md-10">
+                    <div class="form-group row">
+                        @foreach ($optionals as $optional)
+                            <div style="width: 33.33% !important; float: left;">
+                                <div style="width: 30px; float: left;">
+                                    {{ Form::checkbox('optionals[]',  $optional->id, in_array($optional->id, $optionalsSelect)) }}
+                                </div>
+                                <div style="width: calc(100% - 30px); float: left;">
+                                    {{ Form::label($optional->name, ucfirst($optional->name)) }}
+                                </div>
+                            </div>
+                        @endforeach
+                    </div>
+                </div>
+            </div>
+        </fieldset>
+
+        <fieldset>
+            <legend>Opcionales</legend>
+            <div class="row">
+                <div class="offset-md-1 col-md-10">
+                    <div class="form-group row">
+                        @foreach ($extras as $extra)
+                            <div style="width: 33.33% !important; float: left;">
+                                <div style="width: 30px; float: left;">
+                                    {{ Form::checkbox('extras[]',  $extra->id, in_array($extra->id, $optionalsSelect)) }}
+                                </div>
+                                <div style="width: calc(100% - 30px); float: left;">
+                                    {{ Form::label($extra->name, ucfirst($extra->name)) }}
+                                </div>
+                            </div>
+                        @endforeach
+                    </div>
+                </div>
+            </div>
+        </fieldset>
+
         {{ Form::submit('Continuar', array('class' => 'btn btn-primary')) }}
 
 

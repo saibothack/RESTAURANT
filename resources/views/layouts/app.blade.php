@@ -80,6 +80,11 @@
                                     <i class="fa fa-user fa-lg"></i>&nbsp;&nbsp;&nbsp;Usuarios
                                 </li>
                             </a>
+                            <a href="{{ route('optionals.index') }}">
+                                <li>
+                                    <i class="fa fa-globe fa-lg"></i>&nbsp;&nbsp;&nbsp;Extras y Opcionales
+                                </li>
+                            </a>
                             <a href="{{ route('menus.index') }}">
                                 <li>
                                     <i class="fa fa-globe fa-lg"></i>&nbsp;&nbsp;&nbsp;Menu

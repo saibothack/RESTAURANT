@@ -2,8 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use DB;
+use phpDocumentor\Reflection\Types\Integer;
 use Session;
 use App\Menu;
+use App\Optional;
 use App\Restaurant;
 use Illuminate\Http\Request;
 
@@ -45,6 +48,9 @@ class MenuController extends Controller
     {
         $restaurants = Restaurant::active(1)->pluck('name', 'id');
 
+        $optionals = Optional::type('2')->get();
+        $extras = Optional::type('1')->get();
+
         $arrayStatus = array(
             '' => 'Seleccione',
             '0' => 'Deshabilitado',
@@ -52,7 +58,7 @@ class MenuController extends Controller
             '2' => 'Agotado'
         );
 
-        return view('menus.create', compact('menus', 'arrayStatus', 'restaurants'));
+        return view('menus.create', compact('menus', 'arrayStatus', 'restaurants', 'optionals', 'extras'));
     }
 
     /**
@@ -66,6 +72,21 @@ class MenuController extends Controller
         $this->validaMenu($request);
 
         $menu = Menu::create($request->only('restaurants_id', 'title', 'description', 'price', 'active'));
+
+        $optionals = $request['optionals'];
+        $extras = $request['extras'];
+
+        foreach ($optionals as $optional) {
+            DB::table('optionals_has_menu')->insertGetId(
+                ['menus_id' => $menu->id, 'optionals_id' => $optional]
+            );
+        }
+
+        foreach ($extras as $extra) {
+            DB::table('optionals_has_menu')->insertGetId(
+                ['menus_id' => $menu->id, 'optionals_id' => $extra]
+            );
+        }
 
         return redirect()->route('menus.index')
             ->with('flash_message',
@@ -93,6 +114,24 @@ class MenuController extends Controller
     {
         $restaurants = Restaurant::active(1)->pluck('name', 'id');
 
+        $optionals = Optional::type('2')->get();
+        $extras = Optional::type('1')->get();
+
+        $selectQuery = DB::table('optionals')->select('optionals.id')
+                        ->join('optionals_has_menu', function ($join) use ($id) {
+                            $join->on('optionals.id', '=', 'optionals_has_menu.optionals_id')
+                                ->where('optionals_has_menu.menus_id', '=', $id);
+                        })
+                        ->get();
+
+        $optionalsSelect = array();
+        $i = 0;
+
+        foreach($selectQuery as $select){
+            $optionalsSelect[$i] = $select->id;
+            $i++;
+        }
+
         $menu = Menu::findOrFail($id);
 
         $arrayStatus = array(
@@ -101,7 +140,7 @@ class MenuController extends Controller
             '1' => 'Activado'
         );
 
-        return view('menus.edit', compact('menu', 'arrayStatus', 'restaurants'));
+        return view('menus.edit', compact('menu', 'arrayStatus', 'restaurants', 'optionals', 'extras', 'optionalsSelect'));
     }
 
     /**
@@ -117,6 +156,24 @@ class MenuController extends Controller
 
         $menu = Menu::findOrFail($id);
         $menu->fill($request->only('restaurants_id', 'title', 'description', 'price', 'active'))->save();
+
+        DB::table('optionals_has_menu')->where('menus_id', '=', $menu->id)->delete();
+
+        if (isset($request['optionals'])) {
+            foreach ($request['optionals'] as $optional) {
+                $id = DB::table('optionals_has_menu')->insertGetId(
+                    ['menus_id' => $menu->id, 'optionals_id' => $optional]
+                );
+            }
+        }
+
+        if (isset($request['extras'])) {
+            foreach ($request['extras'] as $extra) {
+                $id = DB::table('optionals_has_menu')->insertGetId(
+                    ['menus_id' => $menu->id, 'optionals_id' => $extra]
+                );
+            }
+        }
 
         return redirect()->route('menus.index')
             ->with('flash_message',

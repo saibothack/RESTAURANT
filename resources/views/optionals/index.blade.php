@@ -15,52 +15,53 @@
 @section('content')
 
 <div class="col-lg-12">
-    <h3><i class="fa fa-users"></i> Roles</h3>
+    <h3><i class="fa fa-users"></i> Opcionales</h3>
     <hr>
-     <div style="width: 100%; display: inline-flex; margin-bottom: 10px;">
-        <div style="width: 50% !important;">
-            <!-- agregar -->
-            <a href="{{ URL::to('roles/create') }}" class="btn btn-success">
+    {!! Form::open(['route' => 'optionals.index', 'method' => 'get']) !!}
+    <div class="form-group row">
+        <div class="col-md-2">
+            <a href="{{ URL::to('optionals/create') }}" class="btn btn-success">
                 Agregar
             </a>
         </div>
-
-        {!! Form::open(['route' => 'roles.index', 'method' => 'get', 'style' => 'width: 50% !important;']) !!}
-        <div style="width: 100% !important; display: inline-flex;">
-            <div style="width: calc(100% - 105px) !important; margin-right: 5px; text-align: right !important;" >
-                {{ Form::text('search', null, array('class' => 'form-control', 'placeholder' => 'Ingrese su busqueda')) }}
-            </div>
-            <div style="width: 95px !important; text-align: right !important;" >
-                <input type="submit" value="Buscar" class="btn btn-primary">
-            </div>
+        <div class="col-md-5">
+            {{ Form::text('search', null, array('class' => 'form-control', 'placeholder' => 'Ingrese su busqueda')) }}
         </div>
-        {!! Form::close() !!}
+        <div class="col-md-3">
+            {{ Form::select('type', $arrayType, null, array('class' => 'form-control')) }}
+        </div>
+        <div class="col-md-2 text-right">
+            <input type="submit" value="Buscar" class="btn btn-primary">
+        </div>
     </div>
+    {!! Form::close() !!}
 
     <div class="table-responsive">
         <table class="table table-bordered table-striped">
             <thead>
                 <tr>
-                    <th>Rol</th>
-                    <th>Permisos</th>
+                    <th>Opcionales</th>
+                    <th>Precio</th>
+                    <th>Tipo</th>
                     <th>Opciones</th>
                 </tr>
             </thead>
 
             <tbody>
-                @foreach ($roles as $role)
+                @foreach ($optionals as $optional)
                 <tr>
 
-                    <td>{{ $role->name }}</td>
+                    <td>{{ $optional->name }}</td>
+                    <td>$ {{ number_format($optional->price, 2, '.', ',') }}</td>
+                    <td>{{ $arrayType[$optional->type] }}</td>
 
-                    <td>{{ str_replace(array('[',']','"'),' ', $role->permissions()->pluck('name')) }}</td>
                     <td class="tdOptions">
                         <div style="display: inline-flex;">
-                            <a href="{{ URL::to('roles/'.$role->id.'/edit') }}" class="btn btn-info" style="margin: 1px !important">
+                            <a href="{{ URL::to('optionals/'.$optional->id.'/edit') }}" class="btn btn-info" style="margin: 1px !important">
                                 <i class="fa fa-fw fa-edit"></i>
                             </a>
 
-                            {!! Form::open(['method' => 'DELETE', 'route' => ['roles.destroy', $role->id] ]) !!}
+                            {!! Form::open(['method' => 'DELETE', 'route' => ['optionals.destroy', $optional->id] ]) !!}
                                 <button class="btn btn-danger" type="submit" style="margin-right: 1px !important">
                                     <i class="fa fa-fw fa-trash"></i>
                                 </button>
@@ -74,7 +75,7 @@
 
         </table>
 
-         {{ $roles->links() }}
+         {{ $optionals->links() }}
 
     </div>
 </div>

@@ -12,9 +12,17 @@ class OptionalController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
     {
-        //
+        $optionals = Optional::search($request->get('search'))->type($request->get('type'))->paginate(10);
+
+        $arrayType = array(
+            '' => 'Seleccione',
+            '1' => 'Extra',
+            '2' => 'Opcional'
+        );
+
+        return view('optionals.index', compact('optionals', 'arrayType'));
     }
 
     /**
@@ -24,7 +32,12 @@ class OptionalController extends Controller
      */
     public function create()
     {
-        //
+        $arrayType = array(
+            '1' => 'Extra',
+            '2' => 'Opcional'
+        );
+
+        return view('optionals.create', compact('arrayType'));
     }
 
     /**
@@ -35,7 +48,13 @@ class OptionalController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $this->validaOptionals($request);
+
+        Optional::create($request->all());
+
+        return redirect()->route('optionals.index')
+            ->with('flash_message',
+                'El registro fue dado de alta!');
     }
 
     /**
@@ -57,7 +76,14 @@ class OptionalController extends Controller
      */
     public function edit(Optional $optional)
     {
-        //
+        $optional = Optional::findOrFail($optional['id']);
+
+        $arrayType = array(
+            '1' => 'Extra',
+            '2' => 'Opcional'
+        );
+
+        return view('optionals.edit', compact('optional', 'arrayType'));
     }
 
     /**
@@ -69,7 +95,14 @@ class OptionalController extends Controller
      */
     public function update(Request $request, Optional $optional)
     {
-        //
+        $this->validaOptionals($request);
+
+        $optional = Optional::findOrFail($optional['id']);
+        $optional->fill($request->all())->save();
+
+        return redirect()->route('optionals.index')
+            ->with('flash_message',
+                'Su registro se modifico correctamente!');
     }
 
     /**
@@ -80,6 +113,21 @@ class OptionalController extends Controller
      */
     public function destroy(Optional $optional)
     {
-        //
+        $optional = Optional::findOrFail($optional['id']);
+        $optional->delete();
+
+        return redirect()->route('optionals.index')
+            ->with('flash_message',
+                'Su registro fue eliminado!');
+    }
+
+    public function validaOptionals($request)
+    {
+        $this->validate($request, [
+                'type'=>'required|int',
+                'name'=>'required|string',
+                'price'=>'required'
+            ]
+        );
     }
 }

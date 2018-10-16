@@ -28,8 +28,11 @@
     <div class="container">
         <br>
         <div class="row">
-            <div class="col-md-12 text-center">
+            <div class="offset-md-6 col-md-1 text-center">
                 <h1>Menú</h1>
+            </div>
+            <div class="offset-md-2 col-md-2 text-right">
+                <i class="fa fa-cart-plus fa-3x" aria-hidden="true"></i>
             </div>
         </div>
         <br>
