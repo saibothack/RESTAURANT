@@ -18,7 +18,12 @@ class CreateOptionalsTable extends Migration
             $table->string('name');
             $table->float('price');
             $table->integer('type');
+            $table->unsignedInteger('restaurants_id');
             $table->timestamps();
+
+            $table->foreign('restaurants_id')
+                ->references('id')->on('restaurants')
+                ->onDelete('cascade');
         });
 
         Schema::create('optionals_has_menu', function (Blueprint $table) {

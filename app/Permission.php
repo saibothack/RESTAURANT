@@ -19,7 +19,11 @@ class Permission extends \Spatie\Permission\Models\Permission
             'Permisos',
             'Roles',
             'Usuarios',
-            'Menu'
+            'Opcionales',
+            'Restaurantes',
+            'Perfil',
+            'Clientes',
+            'Menus'
         ];
     }
 }

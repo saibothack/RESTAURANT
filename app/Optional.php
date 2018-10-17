@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 class Optional extends Model
 {
     protected $fillable = [
-        'name', 'price', 'type'
+        'name', 'price', 'type', 'restaurants_id'
     ];
 
     public function scopeSearch($query, $search)
@@ -21,6 +21,13 @@ class Optional extends Model
     {
         if ($search != "") {
             $query->where('type', '=', $search);
+        }
+    }
+
+    public function scopeResturant($query, $search)
+    {
+        if ($search != null) {
+            $query->where('restaurants_id', '=', $search);
         }
     }
 }

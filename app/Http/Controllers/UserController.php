@@ -5,11 +5,11 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 
 use Auth;
+use Mail;
 use App\User;
 use App\Restaurant;
+use App\Mail\sendMail;
 use Spatie\Permission\Models\Role;
-use Illuminate\Support\Facades\Hash;
-use Spatie\Permission\Models\Permission;
 
 class UserController extends Controller
 {
@@ -20,6 +20,7 @@ class UserController extends Controller
      */
     public function index(Request $request) {
         $users = User::search($request->get('search'))->paginate(10);
+
         return view('users.index', compact('users'));
     }
 
@@ -43,7 +44,7 @@ class UserController extends Controller
      */
     public function store(Request $request)
     {
-        $this->validateUser($request, $id);
+        $this->validateUser($request, 0);
 
         $password = str_random(8);
 
@@ -57,12 +58,20 @@ class UserController extends Controller
             $user = User::create($dataUser);
         }
 
-
-
         if (isset($dataUser['roles_id'])) {
             $role_r = Role::where('id', '=', $dataUser['roles_id'])->firstOrFail();
             $user->assignRole($role_r);
-        }    
+        }
+
+
+        $email = $request['email'];
+
+        $data = array(
+            'user' => $email,
+            'password' => $password
+        );
+
+        Mail::to($email)->send(new sendMail($data));
 
         return redirect()->route('users.index')
             ->with('flash_message',
@@ -147,5 +156,46 @@ class UserController extends Controller
             'name' => 'required|string|max:255',
             'email' => 'required|string|email|max:255|unique:users,email,'.$id
         ]);
+    }
+
+    public  function getChangePassword($id) {
+        if (Auth::user()->hasRole('Administrador')) {
+            return view('users.change', compact('id'));
+        } else {
+            if (Auth::user()->id != $id) {
+                echo 'No tiene permisos para editar este usuario';
+                exit();
+            } else {
+                return view('users.change', compact('id'));
+            }
+        }
+
+    }
+
+    public  function setChangePassword(Request $request, $id) {
+        if (!Auth::user()->hasRole('Administrador')) {
+            if (Auth::user()->id != $id) {
+                echo 'No tiene permisos para editar este usuario';
+                exit();
+            }
+        }
+
+        $request->flash();
+        $request->flashExcept('password');
+        $request->flashExcept('password_confirmation');
+
+        $user = User::findOrFail($id);
+
+        $this->validate($request, [
+            'password'=>'required|min:6|confirmed',
+        ]);
+
+        $data = $request->only('password');
+
+        $user->fill($data)->save();
+
+        return redirect('users/' . $id . '/password')
+            ->with('flash_message',
+                'Se cambio su contraseña!');
     }
 }

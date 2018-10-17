@@ -50,6 +50,8 @@
 
         {{ Form::submit('Continuar', array('class' => 'btn btn-primary')) }}
 
+        <a href="{{ URL::to('users/' . $user->id . '/password') }}" class="btn btn-primary">Cambiar contraseña</a>
+
 
     {{ Form::close() }}    
 </div>

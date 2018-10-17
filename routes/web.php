@@ -26,6 +26,9 @@ Route::resource('restaurants', 'RestaurantController');
 Route::resource('menus', 'MenuController');
 Route::resource('optionals', 'OptionalController');
 
+Route::get('users/{id}/password', 'UserController@getChangePassword');
+Route::post('users/{id}/password', 'UserController@setChangePassword');
+
 Route::resource('menus/{id}/images', 'MenuImagesController');
 
 Route::get('restaurants/QR/{id}', 'RestaurantController@generateToQR');

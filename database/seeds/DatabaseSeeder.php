@@ -63,7 +63,8 @@ class DatabaseSeeder extends Seeder
       	$dataOptional = array(
             'name' => 'Prueba1',
             'price' => '15',
-            'type' => '1'
+            'type' => '1',
+            'restaurants_id' => 1
         );
 
         $optional = Optional::create($dataOptional);
@@ -75,7 +76,8 @@ class DatabaseSeeder extends Seeder
         $dataOptional = array(
             'name' => 'Prueba2',
             'price' => '20',
-            'type' => '1'
+            'type' => '1',
+            'restaurants_id' => 2
         );
 
         $optional = Optional::create($dataOptional);
@@ -87,7 +89,8 @@ class DatabaseSeeder extends Seeder
         $dataOptional = array(
             'name' => 'Prueba3',
             'price' => '20',
-            'type' => '2'
+            'type' => '2',
+            'restaurants_id' => 1
         );
 
         $optional = Optional::create($dataOptional);
@@ -99,7 +102,8 @@ class DatabaseSeeder extends Seeder
         $dataOptional = array(
             'name' => 'Prueba4',
             'price' => '20',
-            'type' => '2'
+            'type' => '2',
+            'restaurants_id' => 2
         );
 
         $optional = Optional::create($dataOptional);

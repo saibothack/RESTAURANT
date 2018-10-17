@@ -11,6 +11,15 @@
 
     {{ Form::model($optional, array('route' => array('optionals.update', $optional->id), 'method' => 'PUT')) }}
 
+        @hasrole('Administrador')
+            <div class="form-group row">
+                {{ Form::label('restaurants_id', 'Restaurantes', array('class' => 'col-md-2 col-form-label')) }}
+                <div class="col-md-10">
+                    {{ Form::select('restaurants_id', $restaurants, null, array('class' => 'form-control', 'required' => 'required')) }}
+                </div>
+            </div>
+        @endhasrole
+
         <div class="form-group row">
             {{ Form::label('type', 'Tipo de opción', array('class' => 'col-md-2 col-form-label')) }}
             <div class="col-md-10">

@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App;
 use PDF;
+use Auth;
 use View;
 use QrCode;
 use App\User;
@@ -20,6 +21,11 @@ class RestaurantController extends Controller
      */
     public function index(Request $request)
     {
+        if (!Auth::user()->hasRole('Administrador')) {
+            $url = 'restaurants/' . Auth::user()->restaurants_id . '/edit';
+            return redirect($url);
+        }
+
         $restaurants = Restaurant::search($request->get('search'))->active($request->get('active'))->paginate(10);
         $arrayStatus = array(
             '' => 'Seleccione', 
@@ -106,14 +112,22 @@ class RestaurantController extends Controller
      */
     public function update(Request $request, $id)
     {
-        $this->validaRestaurant($request,$id);
-
         $restaurant = Restaurant::findOrFail($id);
-        $restaurant->fill($request->only('domain', 'name', 'email', 'payment_day', 'active', 'days_grace', 'tables', 'price', 'images'))->save();
+        if (Auth::user()->hasRole('Administrador')) {
+            $this->validaRestaurantAdmin($request,$id);
+            $restaurant->fill($request->only('domain', 'name', 'email', 'payment_day', 'active', 'days_grace', 'tables', 'price', 'images'))->save();
+            return redirect()->route('restaurants.index')
+                ->with('flash_message',
+                    'Restaurant '. $restaurant->name.' modificado!');
+        } else {
+            $this->validaRestaurant($request,$id);
+            $restaurant->fill($request->only('name', 'email'))->save();
+            $url = 'restaurants/' . Auth::user()->restaurants_id . '/edit';
+            return redirect($url)->with('flash_message',
+                'Restaurante '. $restaurant->name.' modificado!');
+        }
 
-        return redirect()->route('restaurants.index')
-            ->with('flash_message',
-             'Restaurant '. $restaurant->name.' modificado!');
+
     }
 
     /**
@@ -145,7 +159,7 @@ class RestaurantController extends Controller
                 'Fue eliminado el menu!');
     }
 
-    public function validaRestaurant($request, $id)
+    public function validaRestaurantAdmin($request, $id)
     {
         $this->validate($request, [
             'domain'=>'required|unique:restaurants,domain,'.$id,  
@@ -157,6 +171,15 @@ class RestaurantController extends Controller
             'price'=>'required',
             'active'=>'required|int',
             'images'=>'required|int|min:0|max:10',
+            ]
+        );
+    }
+
+    public function validaRestaurant($request, $id)
+    {
+        $this->validate($request, [
+                'name'=>'required|string',
+                'email'=>'required|email'
             ]
         );
     }

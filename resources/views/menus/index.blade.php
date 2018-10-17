@@ -19,25 +19,44 @@
     <hr>
      
     {!! Form::open(['route' => 'menus.index', 'method' => 'get']) !!}
-    <div class="form-group row">
-        <div class="col-md-2">
-            <a href="{{ URL::to('menus/create') }}" class="btn btn-success">
-                Agregar
-            </a>
-        </div>
-        <div class="col-md-4">
-            {{ Form::text('search', null, array('class' => 'form-control', 'placeholder' => 'Ingrese su busqueda')) }}
-        </div>
-        <div class="col-md-2">
-            {{ Form::select('active', $arrayStatus, null, array('class' => 'form-control')) }}
-        </div>
-        <div class="col-md-2">
-            {{ Form::select('restaurants_id', $restaurants, 0, array('class' => 'form-control')) }}
-        </div>
-        <div class="col-md-2 text-right">
-            <input type="submit" value="Buscar" class="btn btn-primary">
-        </div>
-    </div>
+        @hasrole('Administrador')
+            <div class="form-group row">
+                <div class="col-md-2">
+                    <a href="{{ URL::to('menus/create') }}" class="btn btn-success">
+                        Agregar
+                    </a>
+                </div>
+                <div class="col-md-4">
+                    {{ Form::text('search', null, array('class' => 'form-control', 'placeholder' => 'Ingrese su busqueda')) }}
+                </div>
+                <div class="col-md-2">
+                    {{ Form::select('active', $arrayStatus, null, array('class' => 'form-control')) }}
+                </div>
+                <div class="col-md-2">
+                    {{ Form::select('restaurants_id', $restaurants, 0, array('class' => 'form-control')) }}
+                </div>
+                <div class="col-md-2 text-right">
+                    <input type="submit" value="Buscar" class="btn btn-primary">
+                </div>
+            </div>
+        @else
+            <div class="form-group row">
+                <div class="col-md-2">
+                    <a href="{{ URL::to('menus/create') }}" class="btn btn-success">
+                        Agregar
+                    </a>
+                </div>
+                <div class="col-md-6">
+                    {{ Form::text('search', null, array('class' => 'form-control', 'placeholder' => 'Ingrese su busqueda')) }}
+                </div>
+                <div class="col-md-2">
+                    {{ Form::select('active', $arrayStatus, null, array('class' => 'form-control')) }}
+                </div>
+                <div class="col-md-2 text-right">
+                    <input type="submit" value="Buscar" class="btn btn-primary">
+                </div>
+            </div>
+        @endhasanyrole
     {!! Form::close() !!}
 
     <div class="table-responsive">

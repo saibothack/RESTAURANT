@@ -2,11 +2,17 @@
 
 namespace App\Http\Controllers;
 
+use Auth;
+use App\Role;
 use App\Optional;
+use App\Restaurant;
 use Illuminate\Http\Request;
+use Spatie\Permission\Traits\HasRoles;
 
 class OptionalController extends Controller
 {
+    use HasRoles;
+
     /**
      * Display a listing of the resource.
      *
@@ -14,7 +20,22 @@ class OptionalController extends Controller
      */
     public function index(Request $request)
     {
-        $optionals = Optional::search($request->get('search'))->type($request->get('type'))->paginate(10);
+
+        $restaurants = Restaurant::active(1)->pluck('name', 'id');
+
+        $restaurants[0] = 'Seleccione';
+
+        $idRestaurant = null;
+        if (!Auth::user()->hasRole('Administrador')) {
+            $idRestaurant = Auth::user()->restaurants_id;
+        } else {
+            if (($request->get('restaurants_id') != "") && ($request->get('restaurants_id') != "0")){
+
+                $idRestaurant = $request->get('restaurants_id');
+            }
+        }
+
+        $optionals = Optional::search($request->get('search'))->type($request->get('type'))->resturant($idRestaurant)->paginate(10);
 
         $arrayType = array(
             '' => 'Seleccione',
@@ -22,7 +43,7 @@ class OptionalController extends Controller
             '2' => 'Opcional'
         );
 
-        return view('optionals.index', compact('optionals', 'arrayType'));
+        return view('optionals.index', compact('optionals', 'arrayType', 'restaurants'));
     }
 
     /**
@@ -32,12 +53,16 @@ class OptionalController extends Controller
      */
     public function create()
     {
+        $restaurants = Restaurant::active(1)->pluck('name', 'id');
+
+        $restaurants[0] = 'Seleccione';
+
         $arrayType = array(
             '1' => 'Extra',
             '2' => 'Opcional'
         );
 
-        return view('optionals.create', compact('arrayType'));
+        return view('optionals.create', compact('arrayType', 'restaurants'));
     }
 
     /**
@@ -48,9 +73,21 @@ class OptionalController extends Controller
      */
     public function store(Request $request)
     {
-        $this->validaOptionals($request);
+        if (Auth::user()->hasRole('Administrador')) {
+            $this->validaOptionalsAdmin($request);
+            Optional::create($request->all());
+        } else {
+            $this->validaOptionals($request);
 
-        Optional::create($request->all());
+            $dataOptional = array(
+                'restaurants_id' => Auth::user()->restaurants_id,
+                'type' => $request['type'],
+                'name' => $request['name'],
+                'price' => $request['price']
+            );
+
+            Optional::create($dataOptional);
+        }
 
         return redirect()->route('optionals.index')
             ->with('flash_message',
@@ -76,6 +113,10 @@ class OptionalController extends Controller
      */
     public function edit(Optional $optional)
     {
+        $restaurants = Restaurant::active(1)->pluck('name', 'id');
+
+        $restaurants[0] = 'Seleccione';
+
         $optional = Optional::findOrFail($optional['id']);
 
         $arrayType = array(
@@ -83,7 +124,7 @@ class OptionalController extends Controller
             '2' => 'Opcional'
         );
 
-        return view('optionals.edit', compact('optional', 'arrayType'));
+        return view('optionals.edit', compact('optional', 'arrayType', 'restaurants'));
     }
 
     /**
@@ -95,10 +136,23 @@ class OptionalController extends Controller
      */
     public function update(Request $request, Optional $optional)
     {
-        $this->validaOptionals($request);
-
         $optional = Optional::findOrFail($optional['id']);
-        $optional->fill($request->all())->save();
+
+        if (Auth::user()->hasRole('Administrador')) {
+            $this->validaOptionalsAdmin($request);
+            $optional->fill($request->all())->save();
+        } else {
+            $this->validaOptionals($request);
+
+            $dataOptional = array(
+                'restaurants_id' => Auth::user()->restaurants_id,
+                'type' => $request['type'],
+                'name' => $request['name'],
+                'price' => $request['price']
+            );
+
+            $optional->fill($dataOptional)->save();
+        }
 
         return redirect()->route('optionals.index')
             ->with('flash_message',
@@ -119,6 +173,17 @@ class OptionalController extends Controller
         return redirect()->route('optionals.index')
             ->with('flash_message',
                 'Su registro fue eliminado!');
+    }
+
+    public function validaOptionalsAdmin($request)
+    {
+        $this->validate($request, [
+                'restaurants_id'=>'required|int',
+                'type'=>'required|int',
+                'name'=>'required|string',
+                'price'=>'required'
+            ]
+        );
     }
 
     public function validaOptionals($request)

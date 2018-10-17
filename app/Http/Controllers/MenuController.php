@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 
 use DB;
+use Auth;
 use Session;
 use App\Menu;
 use App\Optional;
@@ -20,12 +21,17 @@ class MenuController extends Controller
      */
     public function index(Request $request)
     {
-        $paginate = 10;
-        if (!isset($request)) {
-            $paginate = $request->get('paginate');
+        $idRestaurant = "";
+        if (!Auth::user()->hasRole('Administrador')) {
+            $idRestaurant = Auth::user()->restaurants_id;
+        } else {
+            if (($request->get('restaurants_id') != "") && ($request->get('restaurants_id') != "0")){
+
+                $idRestaurant = $request->get('restaurants_id');
+            }
         }
 
-        $menus = Menu::search($request->get('search'))->active($request->get('active'))->restaurant($request->get('restaurants_id'))->paginate($paginate);
+        $menus = Menu::search($request->get('search'))->active($request->get('active'))->restaurant($idRestaurant)->paginate(10);
 
         foreach ($menus as $menu)
         {
@@ -54,8 +60,13 @@ class MenuController extends Controller
     {
         $restaurants = Restaurant::active(1)->pluck('name', 'id');
 
-        $optionals = Optional::type('2')->get();
-        $extras = Optional::type('1')->get();
+        $idRestaurant = "";
+        if (!Auth::user()->hasRole('Administrador')) {
+            $idRestaurant = Auth::user()->restaurants_id;
+        }
+
+        $optionals = Optional::type('2')->resturant($idRestaurant)->get();
+        $extras = Optional::type('1')->resturant($idRestaurant)->get();
 
         $arrayStatus = array(
             '' => 'Seleccione',
@@ -75,9 +86,23 @@ class MenuController extends Controller
      */
     public function store(Request $request)
     {
-        $this->validaMenu($request);
+        $menu = null;
+        if (Auth::user()->hasRole('Administrador')) {
+            $this->validaMenuAdmin($request);
+            $menu = Menu::create($request->only('restaurants_id', 'title', 'description', 'price', 'active'));
+        } else {
+            $this->validaMenu($request);
 
-        $menu = Menu::create($request->only('restaurants_id', 'title', 'description', 'price', 'active'));
+            $dataOptional = array(
+                'restaurants_id' => Auth::user()->restaurants_id,
+                'title' => $request['title'],
+                'description' => $request['description'],
+                'price' => $request['price'],
+                'active' => $request['active']
+            );
+
+            $menu = Menu::create($dataOptional);
+        }
 
         if (isset($request['optionals'])) {
             foreach ($request['optionals'] as $optional) {
@@ -121,8 +146,13 @@ class MenuController extends Controller
     {
         $restaurants = Restaurant::active(1)->pluck('name', 'id');
 
-        $optionals = Optional::type('2')->get();
-        $extras = Optional::type('1')->get();
+        $idRestaurant = "";
+        if (!Auth::user()->hasRole('Administrador')) {
+            $idRestaurant = Auth::user()->restaurants_id;
+        }
+
+        $optionals = Optional::type('2')->resturant($idRestaurant)->get();
+        $extras = Optional::type('1')->resturant($idRestaurant)->get();
 
         $selectQuery = DB::table('optionals')->select('optionals.id')
                         ->join('optionals_has_menu', function ($join) use ($id) {
@@ -159,10 +189,23 @@ class MenuController extends Controller
      */
     public function update(Request $request, $id)
     {
-        $this->validaMenu($request);
-
         $menu = Menu::findOrFail($id);
-        $menu->fill($request->only('restaurants_id', 'title', 'description', 'price', 'active'))->save();
+        if (Auth::user()->hasRole('Administrador')) {
+            $this->validaMenuAdmin($request);
+            $menu->fill($request->only('restaurants_id', 'title', 'description', 'price', 'active'))->save();
+        } else {
+            $this->validaMenu($request);
+
+            $dataOptional = array(
+                'restaurants_id' => Auth::user()->restaurants_id,
+                'title' => $request['title'],
+                'description' => $request['description'],
+                'price' => $request['price'],
+                'active' => $request['active']
+            );
+
+            $menu->fill($dataOptional)->save();
+        }
 
         DB::table('optionals_has_menu')->where('menus_id', '=', $menu->id)->delete();
 
@@ -203,10 +246,21 @@ class MenuController extends Controller
                 'Fue eliminado el menu!');
     }
 
-    public function validaMenu($request)
+    public function validaMenuAdmin($request)
     {
         $this->validate($request, [
                 'restaurants_id'=>'required|int|min:1',
+                'title'=>'required|string',
+                'description'=>'required|string',
+                'price'=>'required',
+                'active'=>'required|int'
+            ]
+        );
+    }
+
+    public function validaMenu($request)
+    {
+        $this->validate($request, [
                 'title'=>'required|string',
                 'description'=>'required|string',
                 'price'=>'required',

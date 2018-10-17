@@ -11,12 +11,14 @@
     <hr>
     {{ Form::open(array('url' => 'menus')) }}
 
-        <div class="form-group row">
-            {{ Form::label('restaurants_id', 'Restaurantes', array('class' => 'col-md-2 col-form-label')) }}
-            <div class="col-md-10">
-                {{ Form::select('restaurants_id', $restaurants, null, array('class' => 'form-control', 'required' => 'required')) }}
+        @hasrole('Administrador')
+            <div class="form-group row">
+                {{ Form::label('restaurants_id', 'Restaurantes', array('class' => 'col-md-2 col-form-label')) }}
+                <div class="col-md-10">
+                    {{ Form::select('restaurants_id', $restaurants, null, array('class' => 'form-control', 'required' => 'required')) }}
+                </div>
             </div>
-        </div>
+        @endhasrole
 
         <div class="form-group row">
             {{ Form::label('title', 'Platillo', array('class' => 'col-md-2 col-form-label')) }}

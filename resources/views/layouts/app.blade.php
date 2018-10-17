@@ -52,49 +52,78 @@
             <i class="fa fa-bars fa-2x toggle-btn" data-toggle="collapse" data-target="#menu-content"></i>
                 <div class="menu-list">
                     <ul id="menu-content" class="menu-content collapse out">
+
                         @if (Auth::guest())
                             <a href="{{ route('login') }}">
                                 <li>
                                     <i class="fa fa-globe fa-lg"></i>&nbsp;&nbsp;&nbsp;Ingresar
                                 </li>
                             </a>
-                         @else
-                            
-                            <a href="{{ route('roles.index') }}">
-                                <li>
-                                    <i class="fa fa-unlock-alt fa-lg"></i>&nbsp;&nbsp;&nbsp;Roles
-                                </li>
-                            </a>
-                            <a href="{{ route('permissions.index') }}">
-                                <li>
-                                    <i class="fa fa-key fa-lg"></i>&nbsp;&nbsp;&nbsp;Permisos
-                                </li>
-                            </a>
-                            <a href="{{ route('restaurants.index') }}">
-                                <li>
-                                    <i class="fa fa-globe fa-lg"></i>&nbsp;&nbsp;&nbsp;Restaurantes 
-                                </li>
-                            </a>
-                            <a href="{{ route('users.index') }}">
-                                <li>
-                                    <i class="fa fa-user fa-lg"></i>&nbsp;&nbsp;&nbsp;Usuarios
-                                </li>
-                            </a>
-                            <a href="{{ route('optionals.index') }}">
-                                <li>
-                                    <i class="fa fa-globe fa-lg"></i>&nbsp;&nbsp;&nbsp;Extras y Opcionales
-                                </li>
-                            </a>
-                            <a href="{{ route('menus.index') }}">
-                                <li>
-                                    <i class="fa fa-globe fa-lg"></i>&nbsp;&nbsp;&nbsp;Menu
-                                </li>
-                            </a>
-                            <a href="#">
-                                <li>
-                                    <i class="fa fa-globe fa-lg"></i>&nbsp;&nbsp;&nbsp;Clientes
-                                </li>
-                            </a>
+                        @else
+
+                            @if (!empty(Auth::user()->hasPermissionTo('Roles')))
+                                <a href="{{ route('roles.index') }}">
+                                    <li>
+                                        <i class="fa fa-unlock-alt fa-lg"></i>&nbsp;&nbsp;&nbsp;Roles
+                                    </li>
+                                </a>
+                            @endif
+
+                            @if (!empty(Auth::user()->hasPermissionTo('Permisos')))
+                                <a href="{{ route('permissions.index') }}">
+                                    <li>
+                                        <i class="fa fa-key fa-lg"></i>&nbsp;&nbsp;&nbsp;Permisos
+                                    </li>
+                                </a>
+                            @endif
+
+                            @if (!empty(Auth::user()->hasPermissionTo('Restaurantes')))
+                                <a href="{{ route('restaurants.index') }}">
+                                    <li>
+                                        <i class="fa fa-globe fa-lg"></i>&nbsp;&nbsp;&nbsp;Restaurantes
+                                    </li>
+                                </a>
+                            @endif
+
+                            @if (!empty(Auth::user()->hasPermissionTo('Perfil')))
+                                <a href="{{ route('restaurants.index') }}">
+                                    <li>
+                                        <i class="fa fa-globe fa-lg"></i>&nbsp;&nbsp;&nbsp;Perfil
+                                    </li>
+                                </a>
+                            @endif
+
+                            @if (!empty(Auth::user()->hasPermissionTo('Usuarios')))
+                                <a href="{{ route('users.index') }}">
+                                    <li>
+                                        <i class="fa fa-user fa-lg"></i>&nbsp;&nbsp;&nbsp;Usuarios
+                                    </li>
+                                </a>
+                            @endif
+
+                            @if (!empty(Auth::user()->hasPermissionTo('Opcionales')))
+                                <a href="{{ route('optionals.index') }}">
+                                    <li>
+                                        <i class="fa fa-globe fa-lg"></i>&nbsp;&nbsp;&nbsp;Extras y Opcionales
+                                    </li>
+                                </a>
+                            @endif
+
+                            @if (!empty(Auth::user()->hasPermissionTo('Menus')))
+                                <a href="{{ route('menus.index') }}">
+                                    <li>
+                                        <i class="fa fa-globe fa-lg"></i>&nbsp;&nbsp;&nbsp;Menu
+                                    </li>
+                                </a>
+                            @endif
+
+                            @if (!empty(Auth::user()->hasPermissionTo('Clientes')))
+                                <a href="#">
+                                    <li>
+                                        <i class="fa fa-globe fa-lg"></i>&nbsp;&nbsp;&nbsp;Clientes
+                                    </li>
+                                </a>
+                            @endif
 
                             <a href="{{ route('logout') }}" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
                                 <li>
@@ -102,7 +131,7 @@
 
                                     <form id="logout-form" action="{{ route('logout') }}" method="POST" style="display: none;">
                                         {{ csrf_field() }}
-                                    </form> 
+                                    </form>
                                 </li>
                             </a>
                             
